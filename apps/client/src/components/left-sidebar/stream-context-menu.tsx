@@ -1,5 +1,11 @@
 import { UserAvatar } from '@/components/user-avatar';
 import { useStreamVolumeControl } from '@/components/voice-provider/hooks/use-stream-volume-control';
+import { cn } from '@/lib/utils';
+import {
+  isVolumeBoosted,
+  VOLUME_MAX_PERCENT,
+  VOLUME_MIN_PERCENT
+} from '@sharkord/shared';
 import {
   Button,
   ContextMenu,
@@ -42,6 +48,7 @@ const StreamContextMenu = (props: TStreamContextMenuProps) => {
           streamKey: props.streamKey
         }
   );
+  const isBoosted = isVolumeBoosted(volume);
 
   const header = useMemo(() => {
     if (props.type === 'user') {
@@ -98,15 +105,22 @@ const StreamContextMenu = (props: TStreamContextMenuProps) => {
           <Slider
             value={[volume]}
             onValueChange={([val]) => setVolume(val ?? 0)}
-            min={0}
-            max={100}
+            min={VOLUME_MIN_PERCENT}
+            max={VOLUME_MAX_PERCENT}
             step={1}
           />
           <div className="mt-2 flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
               {t('userVolume')}
             </span>
-            <span className="text-xs text-muted-foreground">{volume}%</span>
+            <span
+              className={cn(
+                'text-xs',
+                isBoosted ? 'text-primary font-medium' : 'text-muted-foreground'
+              )}
+            >
+              {volume}%
+            </span>
           </div>
         </div>
       </ContextMenuContent>

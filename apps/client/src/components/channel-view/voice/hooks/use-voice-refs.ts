@@ -2,7 +2,7 @@ import { useDevices } from '@/components/devices-provider/hooks/use-devices';
 import { useVolumeControl } from '@/components/voice-provider/volume-control-context';
 import { useIsOwnUser } from '@/features/server/users/hooks';
 import { useVoice } from '@/features/server/voice/hooks';
-import { applyAudioOutputDevice } from '@/helpers/audio-output';
+import { applyRemoteAudioElement } from '@/helpers/audio-volume';
 import { StreamKind } from '@sharkord/shared';
 import { useEffect, useMemo } from 'react';
 import { useAudioLevel } from './use-audio-level';
@@ -102,16 +102,13 @@ const useVoiceRefs = (
   }, [videoStream, videoRef]);
 
   useEffect(() => {
-    if (!audioStream || !audioRef.current) return;
-
-    if (audioRef.current.srcObject !== audioStream) {
-      audioRef.current.srcObject = audioStream;
-    }
-
-    audioRef.current.volume = userVolume / 100;
-    audioRef.current.muted = ownVoiceState.soundMuted;
-
-    applyAudioOutputDevice(audioRef.current, devices.playbackId);
+    applyRemoteAudioElement({
+      audioElement: audioRef.current,
+      stream: audioStream,
+      volumePercent: userVolume,
+      playbackId: devices.playbackId,
+      isDeafened: ownVoiceState.soundMuted
+    });
   }, [
     audioStream,
     audioRef,
@@ -121,16 +118,13 @@ const useVoiceRefs = (
   ]);
 
   useEffect(() => {
-    if (!screenShareAudioStream || !screenShareAudioRef.current) return;
-
-    if (screenShareAudioRef.current.srcObject !== screenShareAudioStream) {
-      screenShareAudioRef.current.srcObject = screenShareAudioStream;
-    }
-
-    screenShareAudioRef.current.volume = userScreenVolume / 100;
-    screenShareAudioRef.current.muted = ownVoiceState.soundMuted;
-
-    applyAudioOutputDevice(screenShareAudioRef.current, devices.playbackId);
+    applyRemoteAudioElement({
+      audioElement: screenShareAudioRef.current,
+      stream: screenShareAudioStream,
+      volumePercent: userScreenVolume,
+      playbackId: devices.playbackId,
+      isDeafened: ownVoiceState.soundMuted
+    });
   }, [
     screenShareAudioStream,
     screenShareAudioRef,
@@ -148,16 +142,13 @@ const useVoiceRefs = (
   }, [screenShareStream, screenShareRef]);
 
   useEffect(() => {
-    if (!externalAudioStream || !externalAudioRef.current) return;
-
-    if (externalAudioRef.current.srcObject !== externalAudioStream) {
-      externalAudioRef.current.srcObject = externalAudioStream;
-    }
-
-    externalAudioRef.current.volume = externalVolume / 100;
-    externalAudioRef.current.muted = ownVoiceState.soundMuted;
-
-    applyAudioOutputDevice(externalAudioRef.current, devices.playbackId);
+    applyRemoteAudioElement({
+      audioElement: externalAudioRef.current,
+      stream: externalAudioStream,
+      volumePercent: externalVolume,
+      playbackId: devices.playbackId,
+      isDeafened: ownVoiceState.soundMuted
+    });
   }, [
     externalAudioStream,
     externalAudioRef,

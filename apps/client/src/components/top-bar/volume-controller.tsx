@@ -6,6 +6,12 @@ import {
 import { useVoiceUsersByChannelId } from '@/features/server/hooks';
 import { useOwnUserId, useUserById } from '@/features/server/users/hooks';
 import { useVoiceChannelAudioExternalStreams } from '@/features/server/voice/hooks';
+import { cn } from '@/lib/utils';
+import {
+  isVolumeBoosted,
+  VOLUME_MAX_PERCENT,
+  VOLUME_MIN_PERCENT
+} from '@sharkord/shared';
 import {
   Button,
   Popover,
@@ -48,6 +54,7 @@ const AudioStreamControl = memo(
     const { getVolume, setVolume, toggleMute } = useVolumeControl();
     const volume = getVolume(volumeKey);
     const isMuted = volume === 0;
+    const isBoosted = isVolumeBoosted(volume);
 
     return (
       <div className="flex items-center gap-3 py-2">
@@ -83,14 +90,19 @@ const AudioStreamControl = memo(
             <Slider
               value={[volume]}
               onValueChange={(values) => setVolume(volumeKey, values[0] || 0)}
-              min={0}
-              max={100}
+              min={VOLUME_MIN_PERCENT}
+              max={VOLUME_MAX_PERCENT}
               step={1}
               className="cursor-pointer"
             />
           </div>
 
-          <span className="text-xs text-muted-foreground w-8 text-right">
+          <span
+            className={cn(
+              'w-10 text-right text-xs',
+              isBoosted ? 'text-primary font-medium' : 'text-muted-foreground'
+            )}
+          >
             {volume}%
           </span>
         </div>

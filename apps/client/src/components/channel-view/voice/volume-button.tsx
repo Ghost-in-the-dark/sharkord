@@ -2,6 +2,12 @@ import {
   useVolumeControl,
   type TVolumeKey
 } from '@/components/voice-provider/volume-control-context';
+import { cn } from '@/lib/utils';
+import {
+  isVolumeBoosted,
+  VOLUME_MAX_PERCENT,
+  VOLUME_MIN_PERCENT
+} from '@sharkord/shared';
 import {
   IconButton,
   Popover,
@@ -25,6 +31,7 @@ const VolumeButton = memo(
     const { getVolume, setVolume, toggleMute } = useVolumeControl();
     const volume = getVolume(volumeKey);
     const isMuted = volume === 0;
+    const isBoosted = isVolumeBoosted(volume);
 
     const handleVolumeChange = useCallback(
       (values: number[]) => {
@@ -69,12 +76,17 @@ const VolumeButton = memo(
             <Slider
               value={[volume]}
               onValueChange={handleVolumeChange}
-              min={0}
-              max={100}
+              min={VOLUME_MIN_PERCENT}
+              max={VOLUME_MAX_PERCENT}
               step={1}
               className="flex-1 cursor-pointer"
             />
-            <span className="text-xs text-muted-foreground w-8 text-right">
+            <span
+              className={cn(
+                'w-10 text-right text-xs',
+                isBoosted ? 'text-primary font-medium' : 'text-muted-foreground'
+              )}
+            >
               {volume}%
             </span>
           </div>

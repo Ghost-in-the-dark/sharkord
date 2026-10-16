@@ -3,6 +3,7 @@ import {
   LocalStorageKey,
   setLocalStorageItemAsJSON
 } from '@/helpers/storage';
+import { clampVolumePercent } from '@sharkord/shared';
 import {
   createContext,
   memo,
@@ -71,14 +72,16 @@ const VolumeControlProvider = memo(
     );
 
     const setVolume = useCallback((key: TVolumeKey, volume: number) => {
+      const clampedVolume = clampVolumePercent(volume);
+
       setVolumes((prev) => {
-        const next = { ...prev, [key]: volume };
+        const next = { ...prev, [key]: clampedVolume };
         saveVolumesToStorage(next);
         return next;
       });
 
-      if (volume > 0) {
-        previousVolumesRef.current[key] = volume;
+      if (clampedVolume > 0) {
+        previousVolumesRef.current[key] = clampedVolume;
       }
     }, []);
 
