@@ -15,8 +15,10 @@ class Updater {
   private checkTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
+    // this binary is built from a fork, so it must not update itself from the upstream
+    // repository: that would replace it with a stock build and drop the fork changes
     this.bunUpdater = new BunUpdater({
-      repoOwner: 'Sharkord',
+      repoOwner: 'Ghost-in-the-dark',
       repoName: 'sharkord',
       currentVersion: SERVER_VERSION
     });
